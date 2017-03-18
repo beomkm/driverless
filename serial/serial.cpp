@@ -4,12 +4,18 @@
 #include <termios.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
+#include <time.h>
+
+double estimate(clock_t, clock_t);
+
+int receiveData(int, char*);
 
 
 int main(void)
 {
-	char portname[32] = "/dev/ttyS0";
+	char portname[32] = "/dev/ttyUSB0";
 
 	int fd = open(portname, O_RDWR | O_NOCTTY | O_SYNC);
 	assert(fd > -1);
@@ -26,54 +32,80 @@ int main(void)
 	//raw input (unuse signal bits)
 	serial.c_lflag = ~(ICANON | ECHO | ECHOE | ISIG);
 
+	serial.c_cc[VTIME] = 0;
+	//block until receive 1 byte
+	serial.c_cc[VMIN] = 1;
+
 	tcflush(fd, TCIFLUSH);
 	tcsetattr(fd, TCSANOW, &serial);
 
 	
 	char buf[32];
-	int recvSize = 18;
+	int recvSize = 15; //18byte - magicnum
 
 	int n, i;
 
 	
 	int cnt = 0;
 
+	clock_t setTime;
+	clock_t stopTime;
+
+	int temp;	
+
+	char sendData[14] = {'S', 'T', 'X', 0x01, 0x00, 0x01, 0x00, 0x00,
+						0xFE, 0xA0, 0x01, 0, 0x0D, 0x0A};
+						
+
 	for (;;) {
-		read(fd, buf, recvSize);
+		
+		setTime = clock();
+
+		receiveData(fd, buf);
+
+		stopTime = clock();
+	
+		
+		system("clear");
 		printf("%d ", cnt++);
 
-		for( i = 0; i<recvSize; i++) {
-			printf("%d ", buf[i]);
+		for(i = 0; i<13; i++) {
+			printf("%X ", buf[i]);
 		}
-		printf("magic : %c%c%c\n", buf[0], buf[1], buf[2]); 
-		if (buf[3] == 0)
+		putchar('\n');
+
+		if (buf[0] == 0)
 			puts("AorM : manual");
 		else
 			puts("AorM : auto");
 
-		if (buf[4] == 0)
+		if (buf[1] == 0)
 			puts("E-STOP : off");
 		else
 			puts("E-STOP : on");
 
-		if (buf[5] == 0)
+		if (buf[2] == 0)
 			puts("E-STOP : forward drive");
-		else if (buf[5] == 1)
+		else if (buf[2] == 1)
 			puts("E-STOP : neutral");
 		else
 			puts("E-STOP : backward drive");
 
-		printf("SPEED : %X %X\n", buf[6], buf[7]);
-		printf("STEER : %hd\n", (buf[8]<<8&0xFF00)|buf[9]);
-		printf("BRAKE : %d\n", buf[10]);
-		printf("STEER : %X %X %X %X\n", buf[11], buf[12], buf[13], buf[14]);
+		printf("SPEED : 0x%X 0x%X\n", buf[3], buf[4]);
+		printf("STEER : %hd\n", buf[5] | (buf[6]<<8&0xFF00));
+		printf("BRAKE : %d\n", buf[7]);
+		printf("ENC : 0x%X 0x%X 0x%X 0x%X\n", buf[8], buf[9], buf[10], buf[11]);
 
-		printf("ALIVE : %hhu\n", buf[15]);
-		printf("ETX0 : %X\n", buf[16]);
-		printf("ETX1 : %X\n", buf[17]);
-
+		printf("ALIVE : %hhu\n", buf[12]);
 
 		putchar('\n');
+
+
+		printf("%.2lf per second\n", 1/estimate(setTime, stopTime));
+
+
+		write(fd, sendData, 14);
+		sendData[11] += 1;
 	}
 
 
@@ -81,4 +113,55 @@ int main(void)
 
 	return 0;
 
+
 }
+
+
+
+double estimate(clock_t setTime, clock_t stopTime)
+{
+	return ((double)stopTime - (double)setTime) / (CLOCKS_PER_SEC/1000);
+}
+
+
+int receiveData(int fd, char *buf)
+{
+	char magic;
+	char temp[13];
+	int flag = 1;
+
+
+	for(;flag;) {
+		read(fd, &magic, 1);
+		if (magic != 'S')
+			continue;
+
+		read(fd, &magic, 1);
+		if (magic != 'T')
+			continue;
+
+		read(fd, &magic, 1);
+		if (magic != 'X')
+			continue;
+
+		for(int i=0; i<13; i++) {
+			read(fd, &temp[i], 1);
+		}
+
+		read(fd, &magic, 1);
+		if (magic != 0x0D)
+			continue;
+
+		read(fd, &magic, 1);
+		if (magic != 0x0A)
+			continue;
+
+		flag = 0;
+	}
+
+	memcpy(buf, temp, 13);
+
+	return 0;
+	
+}
+
