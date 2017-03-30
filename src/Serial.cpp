@@ -11,7 +11,7 @@
 #include "Serial.hpp"
 
 Serial::Serial(char *port, int baud, int size, bool parity,
-				int newline=Serial::CRNL)
+				Newline newline=Newline::CRNL)
 {
 	strncpy(portPath, port, 64);
 	memset(&config, 0, sizeof(struct termios));
@@ -68,13 +68,13 @@ Serial::Serial(char *port, int baud, int size, bool parity,
 	}
 
 	switch(newline) {
-		case Serial::GNCR:
+		case Newline::GNCR:
 			lineBit = IGNCR;
 			break;
-		case Serial::CRNL:
+		case Newline::CRNL:
 			lineBit = ICRNL;
 			break;
-		case Serial::NLCR:
+		case Newline::NLCR:
 			lineBit = INLCR;
 			break;
 		case 
@@ -115,12 +115,14 @@ Serial::close()
 	close(fd);
 }
 
-Serial::readData()
+Serial::readByte(char buf*)
 {
+	return read(fd, buf, 1);
 }
 
-Serial::writeData()
+Serial::writeData(char *buf, int size)
 {
+	return write(fd, buf, size);
 }
 
 

@@ -1,9 +1,10 @@
 #include <cstdio>
+#include <thread>
+
+#include "Serial.h"
 
 int main()
 {
-	int a = 3;
-	printf("a\n");
-	perror("err!!");
+	
 	return 0;
 }

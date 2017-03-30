@@ -1,5 +1,10 @@
 #pragma once
 
+enum class Newline
+{
+	GNCR, CRNL, NLCR
+};
+	
 class Serial
 {
 private:
