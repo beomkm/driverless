@@ -25,7 +25,7 @@ public:
 	int setMode(Mode mode);
 
 	bool getEstop();
-	int setEstop(int estop);
+	int setEstop(bool estop);
 
 	Gear getGear();
 	int setGear(Gear gear);
