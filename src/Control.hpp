@@ -9,17 +9,19 @@ enum class Gear {
 };
 
 
-class ControlERP
+class Control
 {
 private:
 	char sArr[14]; //sending packet
 	char rArr[18]; //receiving packet
+	Serial serial;
 
 public:
 	Control();
 	~Control();
 
 	int waitForUpdate();
+	int sendCommand();
 
 	Mode getMode();
 	int setMode(Mode mode);
@@ -42,4 +44,3 @@ public:
 	int getEncoder();
 
 };
-

@@ -3,8 +3,7 @@
 #include <cstring>
 #include <cerrno>
 #include <ctime>
-
-#include <fcntl.h> 
+#include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
 
@@ -77,7 +76,7 @@ Serial::Serial(char *port, int baud, int size, bool parity,
 		case Newline::NLCR:
 			lineBit = INLCR;
 			break;
-		case 
+		case
 	}
 
 	config.c_cflag = baudBit | sizeBit | CLOCAL | CREAD;
@@ -97,7 +96,7 @@ Serial::~Serial()
 	close();
 }
 
-Serial::open()
+int Serial::open()
 {
 	fd = open(portPath, O_RDWR | O_NOCTTY | O_SYNC);
 	if(fd == -1) {
@@ -108,15 +107,17 @@ Serial::open()
 	tcflush(fd, TCIFLUSH);
 	tcsetattr(fd, TCSANOW, &config);
 
+	return 0;
 }
 
-Serial::close()
+int Serial::close()
 {
-	close(fd);
+	return close(fd);
 }
 
-Serial::readByte(char buf*)
+char Serial::readByte()
 {
+	char
 	return read(fd, buf, 1);
 }
 
@@ -124,7 +125,3 @@ Serial::writeData(char *buf, int size)
 {
 	return write(fd, buf, size);
 }
-
-
-
-

@@ -4,7 +4,7 @@ enum class Newline
 {
 	GNCR, CRNL, NLCR
 };
-	
+
 class Serial
 {
 private:
@@ -20,8 +20,7 @@ public:
 	~Serial();
 	int open();
 	int close();
-	int readData(char *buf);
+	char readByte();
 	int writeData(char *buf, int size);
-		
-};
 
+};

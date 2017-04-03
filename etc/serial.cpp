@@ -1,5 +1,5 @@
 #include <errno.h>
-#include <fcntl.h> 
+#include <fcntl.h>
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
@@ -19,7 +19,7 @@ int main(void)
 
 	int fd = open(portname, O_RDWR | O_NOCTTY | O_SYNC);
 	assert(fd > -1);
-	
+
 	struct termios serial;
 	memset(&serial, 0, sizeof(struct termios));
 
@@ -39,33 +39,33 @@ int main(void)
 	tcflush(fd, TCIFLUSH);
 	tcsetattr(fd, TCSANOW, &serial);
 
-	
+
 	char buf[32];
 	int recvSize = 15; //18byte - magic number
 
 	int n, i;
 
-	
+
 	int cnt = 0;
 
 	clock_t setTime;
 	clock_t stopTime;
 
-	int temp;	
+	int temp;
 
 	char sendData[14] = {'S', 'T', 'X', 0x01, 0x00, 0x01, 0x00, 0x00,
 						0xFE, 0xA0, 0x01, 0, 0x0D, 0x0A};
-						
+
 
 	for (;;) {
-		
+
 		setTime = clock();
 
 		receiveData(fd, buf);
 
 		stopTime = clock();
-	
-		
+
+
 		system("clear");
 		printf("%d ", cnt++);
 
@@ -162,6 +162,5 @@ int receiveData(int fd, char *buf)
 	memcpy(buf, temp, 13);
 
 	return 0;
-	
-}
 
+}

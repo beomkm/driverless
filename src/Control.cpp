@@ -1,14 +1,59 @@
 #include "Control.hpp"
-
+#include "Serial.hpp"
 
 Control::Control()
 {
+	serial = Serial("/dev/ttyUSB0", 115200, 8, false);
+	serial.open();
 }
 Control::~Control()
 {
+	serial.close();
 }
 
-int Control::waitForUpdate();
+int Control::waitForUpdate()
+{
+
+	serial.readByte(rArr);
+
+	char magic;
+	char temp[13];
+	int flag = 1;
+
+
+	for(;flag;) {
+		read(fd, &magic, 1);
+		if (magic != 'S')
+			continue;
+
+		read(fd, &magic, 1);
+		if (magic != 'T')
+			continue;
+
+		read(fd, &magic, 1);
+		if (magic != 'X')
+			continue;
+
+		for(int i=0; i<13; i++) {
+			read(fd, &temp[i], 1);
+		}
+
+		read(fd, &magic, 1);
+		if (magic != 0x0D)
+			continue;
+
+		read(fd, &magic, 1);
+		if (magic != 0x0A)
+			continue;
+
+		flag = 0;
+	}
+}
+
+int Control::sendCommand()
+{
+	return serial.writeData(sArr, 14);
+}
 
 Mode Control::getMode()
 {
@@ -21,9 +66,11 @@ Mode Control::getMode()
 int Control::setMode(Mode mode)
 {
 	if(mode == Mode::MANUAL)
-		wArr[3] = 0;
+		sArr[3] = 0;
 	else
-		wArr[3] = 1;
+		sArr[3] = 1;
+
+	return 0;
 }
 
 bool Control::getEstop()
@@ -37,9 +84,11 @@ bool Control::getEstop()
 int Control::setEstop(bool estop)
 {
 	if(estop == 0)
-		wArr[4] = 0;
+		sArr[4] = 0;
 	else
-		wArr[4] = 1;
+		sArr[4] = 1;
+
+	return 0;
 }
 
 Gear Control::getGear()
@@ -55,11 +104,13 @@ Gear Control::getGear()
 int Control::setGear(Gear gear)
 {
 	if(gear == Gear::FORWARD)
-		wArr[5] = 0;
+		sArr[5] = 0;
 	else if(gear == Gear::NEUTRAL)
-		wArr[5] = 1;
+		sArr[5] = 1;
 	else
-		wArr[5] = 2;
+		sArr[5] = 2;
+
+	return 0;
 }
 
 int Control::getSpeed()
@@ -68,8 +119,10 @@ int Control::getSpeed()
 }
 int Control::setSpeed(int speed)
 {
-	wArr[6] = speed&0xFF00;
-	wArr[7] = speed&0xFF;
+	sArr[6] = speed&0xFF00;
+	sArr[7] = speed&0xFF;
+
+	return 0;
 }
 
 int Control::getSteer()
@@ -79,8 +132,10 @@ int Control::getSteer()
 
 int Control::setSteer(int steer)
 {
-	wArr[8] = speed&0xFF00;
-	wArr[9] = speed&0xFF;
+	sArr[8] = speed&0xFF00;
+	sArr[9] = speed&0xFF;
+
+	return 0;
 }
 
 int Control::getBraking()
@@ -90,7 +145,9 @@ int Control::getBraking()
 
 int Control::setBraking(int breaking)
 {
-	wArr[10] = braking;
+	sArr[10] = braking;
+
+	return 0;
 }
 
 int Control::getEncoder()
