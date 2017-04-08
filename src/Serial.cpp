@@ -9,8 +9,7 @@
 
 #include "Serial.hpp"
 
-Serial::Serial(char *port, int baud, int size, bool parity,
-				Newline newline=Newline::CRNL)
+Serial::Serial(const char *port, int baud, int bits, bool parity, Newline newline)
 {
 	strncpy(portPath, port, 64);
 	memset(&config, 0, sizeof(struct termios));
@@ -41,7 +40,7 @@ Serial::Serial(char *port, int baud, int size, bool parity,
 			exit(1);
 	}
 
-	switch(size) {
+	switch(bits) {
 		case 5:
 			sizeBit = CS5;
 			break;
@@ -76,7 +75,9 @@ Serial::Serial(char *port, int baud, int size, bool parity,
 		case Newline::NLCR:
 			lineBit = INLCR;
 			break;
-		case
+		default:
+			perror("Unsupported newline");
+			exit(1);
 	}
 
 	config.c_cflag = baudBit | sizeBit | CLOCAL | CREAD;
@@ -98,7 +99,7 @@ Serial::~Serial()
 
 int Serial::open()
 {
-	fd = open(portPath, O_RDWR | O_NOCTTY | O_SYNC);
+	fd = ::open(portPath, O_RDWR | O_NOCTTY | O_SYNC);
 	if(fd == -1) {
 		perror("Failed to open port.");
 		exit(1);
@@ -112,16 +113,17 @@ int Serial::open()
 
 int Serial::close()
 {
-	return close(fd);
+	return ::close(fd);
 }
 
-char Serial::readByte()
+inline char Serial::readByte()
 {
-	char
-	return read(fd, buf, 1);
+	char buf;
+	read(fd, &buf, 1);
+	return buf;
 }
 
-Serial::writeData(char *buf, int size)
+int Serial::writeData(char *buf, int size)
 {
 	return write(fd, buf, size);
 }

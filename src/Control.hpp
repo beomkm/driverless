@@ -1,11 +1,14 @@
 #pragma once
 
+#include <string>
+#include "Serial.hpp"
+
 enum class Mode {
 	AUTO, MANUAL
 };
 
 enum class Gear {
-	FORWOARD, NEUTRAL, BACKWARD
+	FORWARD, NEUTRAL, BACKWARD
 };
 
 
@@ -13,7 +16,8 @@ class Control
 {
 private:
 	char sArr[14]; //sending packet
-	char rArr[18]; //receiving packet
+	char rArr[13]; //receiving packet
+	std::string devicePath = "/dev/ttyUSB0";
 	Serial serial;
 
 public:
@@ -39,7 +43,7 @@ public:
 	int setSteer(int steer);
 
 	int getBraking();
-	int setBraking(int breaking);
+	int setBraking(int braking);
 
 	int getEncoder();
 

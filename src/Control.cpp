@@ -1,9 +1,8 @@
 #include "Control.hpp"
 #include "Serial.hpp"
 
-Control::Control()
+Control::Control():	serial(devicePath.c_str(), 115200, 8, false)
 {
-	serial = Serial("/dev/ttyUSB0", 115200, 8, false);
 	serial.open();
 }
 Control::~Control()
@@ -13,41 +12,41 @@ Control::~Control()
 
 int Control::waitForUpdate()
 {
-
-	serial.readByte(rArr);
-
 	char magic;
 	char temp[13];
 	int flag = 1;
 
 
 	for(;flag;) {
-		read(fd, &magic, 1);
-		if (magic != 'S')
+		magic = serial.readByte();
+		if(magic != 'S')
 			continue;
 
-		read(fd, &magic, 1);
-		if (magic != 'T')
+		magic = serial.readByte();
+		if(magic != 'T')
 			continue;
 
-		read(fd, &magic, 1);
-		if (magic != 'X')
+		magic = serial.readByte();
+		if(magic != 'X')
 			continue;
 
 		for(int i=0; i<13; i++) {
-			read(fd, &temp[i], 1);
+			temp[i] = serial.readByte();
 		}
 
-		read(fd, &magic, 1);
-		if (magic != 0x0D)
+		magic = serial.readByte();
+		if(magic != 0x0D)
 			continue;
 
-		read(fd, &magic, 1);
-		if (magic != 0x0A)
+		magic = serial.readByte();
+		if(magic != 0x0A)
 			continue;
 
 		flag = 0;
 	}
+
+
+	return 0;
 }
 
 int Control::sendCommand()
@@ -57,7 +56,7 @@ int Control::sendCommand()
 
 Mode Control::getMode()
 {
-	if(rArr[3] == 0)
+	if(rArr[0] == 0)
 		return Mode::MANUAL;
 	else
 		return Mode::AUTO;
@@ -75,7 +74,7 @@ int Control::setMode(Mode mode)
 
 bool Control::getEstop()
 {
-	if(rArr[4] == 0)
+	if(rArr[1] == 0)
 		return false;
 	else
 		return true;
@@ -93,12 +92,12 @@ int Control::setEstop(bool estop)
 
 Gear Control::getGear()
 {
-	if(rArr[5] == 0)
+	if(rArr[2] == 0)
 		return Gear::FORWARD;
-	else if(rArr[5] == 1)
-		return GEAR::NEUTRAL;
+	else if(rArr[2] == 1)
+		return Gear::NEUTRAL;
 	else
-		return GEAR::BACKWARD;
+		return Gear::BACKWARD;
 }
 
 int Control::setGear(Gear gear)
@@ -115,7 +114,7 @@ int Control::setGear(Gear gear)
 
 int Control::getSpeed()
 {
-	return (rArr[6]&0xFF) | (rArr[7]<<8&0xFF00);
+	return (rArr[3]&0xFF) | (rArr[4]<<8&0xFF00);
 }
 int Control::setSpeed(int speed)
 {
@@ -127,24 +126,25 @@ int Control::setSpeed(int speed)
 
 int Control::getSteer()
 {
-	return (rArr[8]&0xFF) | rArr[9]<<8;
+	return (rArr[5]&0xFF) | rArr[6]<<8;
 }
 
 int Control::setSteer(int steer)
 {
-	sArr[8] = speed&0xFF00;
-	sArr[9] = speed&0xFF;
+	sArr[8] = steer&0xFF00;
+	sArr[9] = steer&0xFF;
 
 	return 0;
 }
 
 int Control::getBraking()
 {
-	return rArr[10];
+	return rArr[7];
 }
 
-int Control::setBraking(int breaking)
+int Control::setBraking(int braking)
 {
+
 	sArr[10] = braking;
 
 	return 0;
@@ -152,6 +152,6 @@ int Control::setBraking(int breaking)
 
 int Control::getEncoder()
 {
-	return (rArr[11]&0xFF) | (rArr[12]<<8&0xFF00) |
-			(rArr[13]<<16&0xFF0000) | (rArr[14]<<24&0xFF000000);
+	return (rArr[8]&0xFF) | (rArr[9]<<8&0xFF00) |
+			(rArr[10]<<16&0xFF0000) | (rArr[11]<<24&0xFF000000);
 }
