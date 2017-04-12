@@ -45,6 +45,7 @@ int Control::waitForUpdate()
 		flag = 0;
 	}
 
+	temp[12]
 
 	return 0;
 }

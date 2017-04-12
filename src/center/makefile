@@ -10,13 +10,13 @@ CFLAGS = -Wall -O1 -g -std=gnu++11
 #CFLAGS = -03 -std=gnu++11
 
 #libraries
-LIBS = -L ./$(BINDIR) -lctrl
+LIBS = -L ./$(BINDIR) -lctrl -lpthread
 
 #dir
 BINDIR = bin
 
 _OBJS = Serial.o Control.o
-OBJS = $(patsubst %,$(BINDIR)/%,$(_OBJS)) 
+OBJS = $(patsubst %,$(BINDIR)/%,$(_OBJS))
 
 main: center.cpp $(BINDIR)/libctrl.a
 	$(CC) $(CFLAGS) -o $(BINDIR)/center.elf center.cpp $(LIBS)

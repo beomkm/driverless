@@ -3,9 +3,6 @@
 #include <mutex>
 #include <iostream>
 
-#include "Serial.hpp"
-#include "Control.hpp"
-
 namespace chro = std::chrono;
 namespace tthr = std::this_thread;
 
@@ -13,22 +10,17 @@ std::mutex mtx;
 
 int handler1(int num)
 {
-	//mtx.lock();
+	mtx.lock();
 	for(int i=0; i<5; i++) {
 		std::cout << num << std::endl;
 		tthr::sleep_for(chro::milliseconds(500));
 	}
-	//mtx.unlock();
+	mtx.unlock();
 	return 0;
 }
 
 int main()
 {
-
-	Control control();
-	control.waitForUpdate();
-	control.getMode();
-
 	std::thread th(handler1, 10);
 	std::thread th2(handler1, 20);
 	int j;
