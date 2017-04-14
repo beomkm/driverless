@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unistd.h>
 #include <termios.h>
 
 enum class Newline
@@ -21,7 +22,11 @@ public:
 	~Serial();
 	int open();
 	int close();
-	char readByte();
+	inline char readByte()
+	{
+		char buf;
+		read(fd, &buf, 1);
+		return buf;
+	}
 	int writeData(char *buf, int size);
-
 };

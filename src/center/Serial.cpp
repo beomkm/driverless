@@ -116,13 +116,6 @@ int Serial::close()
 	return ::close(fd);
 }
 
-inline char Serial::readByte()
-{
-	char buf;
-	read(fd, &buf, 1);
-	return buf;
-}
-
 int Serial::writeData(char *buf, int size)
 {
 	return write(fd, buf, size);

@@ -17,12 +17,16 @@ class Control
 private:
 	char sArr[14]; //sending packet
 	char rArr[13]; //receiving packet
+	int aliveNum;
 	std::string devicePath = "/dev/ttyUSB0";
 	Serial serial;
 
 public:
 	Control();
 	~Control();
+
+	int start();
+	int end();
 
 	int waitForUpdate();
 	int sendCommand();

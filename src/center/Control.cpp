@@ -1,13 +1,35 @@
+#include <cstring>
+
 #include "Control.hpp"
 #include "Serial.hpp"
 
 Control::Control():	serial(devicePath.c_str(), 115200, 8, false)
 {
-	serial.open();
+	sArr[0] = 'S';
+	sArr[1] = 'T';
+	sArr[2] = 'X';
+	sArr[11] = 0;
+	sArr[12] = 0x0D;
+	sArr[13] = 0x0A;
+
+	aliveNum = -1;
+
 }
 Control::~Control()
 {
+	end();
+}
+
+int Control::start()
+{
+	serial.open();
+	return 0;
+}
+
+int Control::end()
+{
 	serial.close();
+	return 0;
 }
 
 int Control::waitForUpdate()
@@ -15,7 +37,6 @@ int Control::waitForUpdate()
 	char magic;
 	char temp[13];
 	int flag = 1;
-
 
 	for(;flag;) {
 		magic = serial.readByte();
@@ -45,13 +66,15 @@ int Control::waitForUpdate()
 		flag = 0;
 	}
 
-	temp[12]
+	memcpy(rArr, temp, 13);
+	aliveNum = temp[12];
 
 	return 0;
 }
 
 int Control::sendCommand()
 {
+	sArr[11] += 1;
 	return serial.writeData(sArr, 14);
 }
 
