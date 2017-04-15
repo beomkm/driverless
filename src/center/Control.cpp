@@ -10,10 +10,15 @@ Control::Control(std::string devPath)
 	sArr[0] = 'S';
 	sArr[1] = 'T';
 	sArr[2] = 'X';
-	sArr[11] = 0;
+	sArr[11] = 0; //alive
 	sArr[12] = 0x0D;
 	sArr[13] = 0x0A;
-
+	setMode(Mode::MANUAL);
+	setEstop(false);
+	setGear(Gear::FORWARD);
+	setSpeed(0);
+	setSteer(0);
+	setBraking(0);
 
 }
 Control::~Control()
@@ -98,9 +103,9 @@ std::string Control::toString()
 	else 		ret += "Off\n";
 
 	ret += "GEAR : ";
-	if(gear == Gear::FORWARD)	ret += "forward drive\n";
-	if(gear == Gear::NEUTRAL) 	ret += "neutral\n";
-	else						ret += "backward drive\n";
+	if(gear == Gear::FORWARD)		ret += "forward drive\n";
+	else if(gear == Gear::NEUTRAL) 	ret += "neutral\n";
+	else							ret += "backward drive\n";
 
 	ret += "SPEED : " + std::to_string(speed) + "\n";
 	ret += "STEER : " + std::to_string(steer) + "\n";
@@ -138,7 +143,7 @@ bool Control::getEstop()
 
 int Control::setEstop(bool estop)
 {
-	if(estop == 0)
+	if(estop == false)
 		sArr[4] = 0;
 	else
 		sArr[4] = 1;
@@ -174,7 +179,7 @@ int Control::getSpeed()
 }
 int Control::setSpeed(int speed)
 {
-	sArr[6] = speed&0xFF00;
+	sArr[6] = (speed&0xFF00)>>8;
 	sArr[7] = speed&0xFF;
 
 	return 0;
@@ -187,7 +192,7 @@ int Control::getSteer()
 
 int Control::setSteer(int steer)
 {
-	sArr[8] = steer&0xFF00;
+	sArr[8] = (steer&0xFF00)>>8;
 	sArr[9] = steer&0xFF;
 
 	return 0;
