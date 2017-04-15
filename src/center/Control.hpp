@@ -3,6 +3,7 @@
 #include <string>
 #include "Serial.hpp"
 
+
 enum class Mode {
 	AUTO, MANUAL
 };
@@ -17,12 +18,10 @@ class Control
 private:
 	char sArr[14]; //sending packet
 	char rArr[13]; //receiving packet
-	int aliveNum;
-	std::string devicePath = "/dev/ttyUSB0";
 	Serial serial;
 
 public:
-	Control();
+	Control(std::string devPath);
 	~Control();
 
 	int start();
@@ -30,6 +29,8 @@ public:
 
 	int waitForUpdate();
 	int sendCommand();
+
+	std::string toString();
 
 	Mode getMode();
 	int setMode(Mode mode);
@@ -50,5 +51,7 @@ public:
 	int setBraking(int braking);
 
 	int getEncoder();
+
+	char getAlive();
 
 };

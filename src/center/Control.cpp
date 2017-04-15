@@ -1,9 +1,11 @@
 #include <cstring>
+#include <string>
 
 #include "Control.hpp"
 #include "Serial.hpp"
 
-Control::Control():	serial(devicePath.c_str(), 115200, 8, false)
+Control::Control(std::string devPath)
+:serial(devPath.c_str(), 115200, 8, false)
 {
 	sArr[0] = 'S';
 	sArr[1] = 'T';
@@ -12,7 +14,6 @@ Control::Control():	serial(devicePath.c_str(), 115200, 8, false)
 	sArr[12] = 0x0D;
 	sArr[13] = 0x0A;
 
-	aliveNum = -1;
 
 }
 Control::~Control()
@@ -67,7 +68,6 @@ int Control::waitForUpdate()
 	}
 
 	memcpy(rArr, temp, 13);
-	aliveNum = temp[12];
 
 	return 0;
 }
@@ -76,6 +76,38 @@ int Control::sendCommand()
 {
 	sArr[11] += 1;
 	return serial.writeData(sArr, 14);
+}
+
+std::string Control::toString()
+{
+	std::string ret;
+	Mode mode = getMode();
+	bool estop = getEstop();
+	Gear gear = getGear();
+	int speed = getSpeed();
+	int steer = getSteer();
+	int braking = getBraking();
+	int encoder = getEncoder();
+
+	ret += "AorM : ";
+	if(mode == Mode::AUTO) 	ret += "Auto\n";
+	else 					ret += "Manual\n";
+
+	ret += "ESTOP : ";
+	if(estop) 	ret += "On\n";
+	else 		ret += "Off\n";
+
+	ret += "GEAR : ";
+	if(gear == Gear::FORWARD)	ret += "forward drive\n";
+	if(gear == Gear::NEUTRAL) 	ret += "neutral\n";
+	else						ret += "backward drive\n";
+
+	ret += "SPEED : " + std::to_string(speed) + "\n";
+	ret += "STEER : " + std::to_string(steer) + "\n";
+	ret += "BRAKE : " + std::to_string(braking) + "\n";
+	ret += "ENC : "   + std::to_string(encoder) + "\n";
+
+	return ret;
 }
 
 Mode Control::getMode()
@@ -178,4 +210,9 @@ int Control::getEncoder()
 {
 	return (rArr[8]&0xFF) | (rArr[9]<<8&0xFF00) |
 			(rArr[10]<<16&0xFF0000) | (rArr[11]<<24&0xFF000000);
+}
+
+char Control::getAlive()
+{
+	return rArr[12];
 }
