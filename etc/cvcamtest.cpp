@@ -45,9 +45,9 @@ int main()
                     int r1 = image->imageData[j + i*width];
                     int r2 = image2->imageData[j + i*width];
                     if(r1-r2 > 32 || r1-r2 < -32) {
-                        dest->imageData[j + i*width] = 255;
-                        dest->imageData[j + i*width + 1] = 255;
-                        dest->imageData[j + i*width + 2] = 255;
+                        //dest->imageData[j + i*width] = 255;
+                        //dest->imageData[j + i*width + 1] = 255;
+                        //dest->imageData[j + i*width + 2] = 255;
                     }
                     else {
                         dest->imageData[j + i*width] = 0;
