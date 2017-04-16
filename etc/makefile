@@ -1,8 +1,6 @@
-CC = g++
-CFLAGS = 
-LIBS = 
+CC = clang++
+CFLAGS =
+LIBS =
 
-ocv: cvtest.cpp
-	$(CC) -o ocv.elf cvtest.cpp `pkg-config opencv --cflags --libs`
-
-
+ocv: cvcamtest.cpp
+	$(CC) -o ocv.elf cvcamtest.cpp `pkg-config opencv --cflags --libs`

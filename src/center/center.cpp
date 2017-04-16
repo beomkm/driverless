@@ -1,9 +1,8 @@
+#include <mutex>
+#include <string>
 #include <thread>
 #include <chrono>
-#include <mutex>
 #include <iostream>
-#include <string>
-#include <unistd.h>
 
 #include "Serial.hpp"
 #include "Control.hpp"
@@ -30,10 +29,7 @@ void controlHandler()
 		control.sendCommand();
 	}
 	control.end();
-
-
 }
-
 
 int main(void)
 {
