@@ -1,0 +1,44 @@
+#include <cstdio>
+#include <stdlib.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/types.h>
+
+int main(void)
+{
+    int shmid;
+    size_t shsize = 1024;
+    const int key = 16000;
+    char *shm;
+
+    if((shmid = shmget((size_t)key, shsize, IPC_CREAT|0666))<0) {
+        perror("shmget");
+        exit(1);
+    }
+
+    if((shm = (char*)shmat(shmid, NULL, 0)) == (char*)-1) {
+        perror("shmat");
+        exit(1);
+    }
+
+    shm[0] = 'a';
+    shm[1] = 'b';
+    shm[2] = 'c';
+
+    putchar('e');
+    putchar('\n');
+
+    getchar();
+
+    if(shmdt(shm) == -1) {
+       perror("shmdt");
+       exit(1);
+    }
+
+    if (shmctl(shmid, IPC_RMID, 0) == -1) {
+       perror("shmctl");
+       exit(1);
+    }
+
+    return 0;
+}
