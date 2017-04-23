@@ -1,8 +1,11 @@
 #include <cstring>
 #include <string>
+#include <iostream>
 
 #include "Control.hpp"
 #include "Serial.hpp"
+#include "Receiver.hpp"
+
 
 Control::Control(std::string devPath)
 :serial(devPath.c_str(), 115200, 8, false)
@@ -20,10 +23,35 @@ Control::Control(std::string devPath)
 	setSteer(0);
 	setBraking(0);
 
+	startThread();
 }
+
+
 Control::~Control()
 {
+	recvThread->join();
 	end();
+}
+
+void Control::startThread()
+{
+	recvThread = new std::thread(&Control::inFunc, this);
+}
+
+void Control::inFunc()
+{
+	int alive;
+	for(;threadFlag;) {
+		waitUpdate();
+		alive = getAlive();
+		system("clear");
+		std::cout << toString() << std::endl;
+		exFunc();
+	}
+}
+
+void Control::setHandler(void (*pf)())
+{
 }
 
 int Control::start()
@@ -38,7 +66,7 @@ int Control::end()
 	return 0;
 }
 
-int Control::waitForUpdate()
+int Control::waitUpdate()
 {
 	char magic;
 	char temp[13];

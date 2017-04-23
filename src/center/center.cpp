@@ -15,24 +15,15 @@ int tempSteer = 0;
 
 void controlHandler()
 {
-	Control control("/dev/ttyUSB0");
-	control.start();
-	char alive;
 
-	for(;controlFlag;) {
-		control.waitForUpdate();
-		alive = control.getAlive();
-		system("clear");
-		std::cout << control.toString() << std::endl;
-		control.setMode(Mode::AUTO);
-		control.setSteer(tempSteer);
-		control.sendCommand();
-	}
-	control.end();
+
 }
 
 int main(void)
 {
+	Control control("/dev/ttyUSB0");
+	control.start();
+
 	char command;
 	bool loopFlag = true;
 	int input;
@@ -50,14 +41,14 @@ int main(void)
 			case 's':
 				std::cout << "input steer : ";
 				std::cin >> input;
-				tempSteer = input;
+				control.setSteer(input);
 				break;
 		}
 	}
 
-	controlFlag = false;
+	control.end();
+	control.stopThread();
 
-	controlThread.join();
 	std::cout << "Exit success" << std::endl;
-	exit(0);
+	return 0;
 }
