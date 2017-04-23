@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <semaphore.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -36,11 +37,14 @@ int main(void)
         for(int i=0; i<100; i++) {
             shm[i] = 'a';
         }
+        usleep(10*1000*1000);
         sem_post(mysem);
+        //usleep(1*1000);
         sem_wait(mysem);
         for(int i=0; i<100; i++) {
             shm[i] = 'Z';
         }
+        //usleep(1*1000);
         sem_post(mysem);
     }
 

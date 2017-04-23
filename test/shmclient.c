@@ -3,6 +3,8 @@
 #include <semaphore.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <errno.h>
+#include <time.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/types.h>
@@ -30,13 +32,42 @@ int main(void)
         exit(1);
     }
 
+    struct timespec ts;
+    if (clock_gettime(CLOCK_REALTIME, &ts) == -1) {
+        perror("clock_gettime");
+        exit(EXIT_FAILURE);
+    }
+    ts.tv_sec += 1;
+
+    int ret;
     for(;;) {
-        printf("[%d]",sem_wait(mysem));
-        for(int i=0; i<100; i++) {
-            putchar(shm[i]);
+        if((ret = sem_timedwait(mysem, &ts)) == 0) {
+            for(int i=0; i<100; i++) {
+                putchar(shm[i]);
+            }
+
+            putchar('\n');
+            sem_post(mysem);
         }
-        sem_post(mysem);
-        putchar('\n');
+        else {
+            switch(errno) {
+                case EDEADLK:
+                    printf("EDEADLK\n");
+                    break;
+                case ETIMEDOUT:
+                    printf("ETIMEDOUT\n");
+                    break;
+                case EINVAL:
+                    printf("EINVAL\n");
+                    break;
+                default:
+                    printf("DEF\n");
+            }
+        }
+        printf("[%d]", ret);
+
+
+
         usleep(100*1000);
     }
 
