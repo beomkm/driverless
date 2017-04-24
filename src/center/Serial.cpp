@@ -19,6 +19,7 @@ Serial::Serial(const char *port, int baud, int bits, bool parity, Newline newlin
 	int parityBit;
 	int lineBit;
 
+	//전송속도 설정
 	switch(baud) {
 		case 9600:
 			baudBit = B9600;
@@ -40,6 +41,7 @@ Serial::Serial(const char *port, int baud, int bits, bool parity, Newline newlin
 			exit(1);
 	}
 
+	//전송비트 설정
 	switch(bits) {
 		case 5:
 			sizeBit = CS5;
@@ -58,6 +60,7 @@ Serial::Serial(const char *port, int baud, int bits, bool parity, Newline newlin
 			exit(1);
 	}
 
+	//패리티비트 설정
 	if(parity) {
 		parityBit = INPCK | PARMRK;
 	}
@@ -65,6 +68,7 @@ Serial::Serial(const char *port, int baud, int bits, bool parity, Newline newlin
 		parityBit = IGNPAR;
 	}
 
+	//데이터구분 설정
 	switch(newline) {
 		case Newline::GNCR:
 			lineBit = IGNCR;
@@ -80,6 +84,7 @@ Serial::Serial(const char *port, int baud, int bits, bool parity, Newline newlin
 			exit(1);
 	}
 
+	//시리얼 통신 설정
 	config.c_cflag = baudBit | sizeBit | CLOCAL | CREAD;
 	config.c_iflag = parityBit | lineBit;
 	//not use output option
@@ -97,6 +102,7 @@ Serial::~Serial()
 	close();
 }
 
+//시리얼포트 오픈
 int Serial::open()
 {
 	fd = ::open(portPath, O_RDWR | O_NOCTTY | O_SYNC);
@@ -111,12 +117,16 @@ int Serial::open()
 	return 0;
 }
 
+//시리얼포트 닫기
 int Serial::close()
 {
 	return ::close(fd);
 }
 
+//데이터쓰기
 int Serial::writeData(char *buf, int size)
 {
 	return write(fd, buf, size);
 }
+
+//Serial::readByte() is lnline

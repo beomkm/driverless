@@ -6,10 +6,11 @@
 #include "Serial.hpp"
 #include "Receiver.hpp"
 
-
+//시리얼 연결 설정
 Control::Control(std::string devPath)
 :serial(devPath.c_str(), 115200, 8, false)
 {
+	//upper to PCU 패킷 기본값 설정
 	sArr[0] = 'S';
 	sArr[1] = 'T';
 	sArr[2] = 'X';

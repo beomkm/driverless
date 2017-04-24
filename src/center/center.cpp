@@ -10,17 +10,9 @@
 namespace chro = std::chrono;
 namespace tthr = std::this_thread;
 
-bool controlFlag = true;
-int tempSteer = 0;
-
-void controlHandler()
-{
-
-
-}
-
 int main(void)
 {
+	//PCU와 시리얼 연결 설정
 	Control control("/dev/ttyUSB0");
 	control.start();
 
@@ -30,14 +22,14 @@ int main(void)
 
 	std::cout << "Central process on" << std::endl;
 
-	std::thread controlThread(controlHandler);
-
 	for(;loopFlag;) {
 		command = getchar();
 		switch(command) {
+			//프로그램 종료
 			case 'q':
 				loopFlag = false;
 				break;
+			//PCU제어 테스트
 			case 's':
 				std::cout << "input steer : ";
 				std::cin >> input;
