@@ -1,4 +1,5 @@
 #include <cstring>
+#include <cstdio>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
@@ -37,12 +38,12 @@ int UDSClient::start()
     return 0;
 }
 
-int UDSClinet::close()
+int UDSClient::close()
 {
     ::close(cSock);
 }
 
-float UDSClinet::recvFloat()
+float UDSClient::recvFloat()
 {
     float buf;
     read(cSock, &buf, sizeof(float));

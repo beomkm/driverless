@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdio>
 #include <opencv2/opencv.hpp>
 #include <time.h>
 #include "../common/UDSServer.hpp"
@@ -19,13 +20,16 @@ int main()
 
 	UDSServer server("/tmp/gtserver");
 	server.start();
+	std::cout << "uds on" << std::endl;
 
 	int key_pressed = 0;
 
-	VideoCapture capture("tracking.mp4");
+	VideoCapture capture("bin/tracking.mp4");
 
-	if (!capture.isOpened())
+	if (!capture.isOpened()) {
+		perror("Invalid video files");
 		return -1;
+	}
 
 	// Calculating Size of frame
 	double dWidth = capture.get(CV_CAP_PROP_FRAME_WIDTH);
@@ -80,8 +84,7 @@ int main()
 		//writer.write(local);
 		imshow("Processed Video", local);
 
-		key_pressed = waitKey(20);
-		key_pressed = waitKey(5);
+		key_pressed = waitKey(25);
 	}
 
 	server.close();

@@ -6,12 +6,17 @@
 
 #include "Serial.hpp"
 #include "Control.hpp"
+#include "../common/UDSClient.hpp"
 
 namespace chro = std::chrono;
 namespace tthr = std::this_thread;
 
 int main()
 {
+
+	UDSClient client("/tmp/gtserver");
+	client.start();
+
 	//PCU와 시리얼 연결 설정
 	Control control("/dev/ttyUSB0");
 	control.start();
@@ -24,6 +29,8 @@ int main()
 
 	control.setMode(Mode::AUTO);
 	for(;loopFlag;) {
+		std::cout << client.recvFloat() << std::endl;
+		/*
 		command = getchar();
 		switch(command) {
 			//프로그램 종료
@@ -37,6 +44,7 @@ int main()
 				control.setSteer(input);
 				break;
 		}
+		*/
 	}
 
 

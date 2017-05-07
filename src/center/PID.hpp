@@ -1,10 +1,7 @@
 #pragma once
 
-#include <string>
-#include <arpa/inet.h>
-#include <sys/un.h>
 
-class UDSClient
+class PID
 {
 private:
 	int cSock;

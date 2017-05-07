@@ -45,8 +45,8 @@ void Control::inFunc()
 		waitUpdate();
 		alive = getAlive();
 		sendCommand();
-		system("clear");
-		std::cout << toString() << std::endl;
+		//system("clear");
+		//std::cout << toString() << std::endl;
 		//exFunc();
 	}
 }
