@@ -3,6 +3,8 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/un.h>
+#include <cstdio>
+#include <iostream>
 
 #include "UDSServer.hpp"
 
@@ -13,16 +15,14 @@ UDSServer::UDSServer(std::string filename)
 
 UDSServer::~UDSServer()
 {
-    close();
+    this->close();
 }
 
-UDSServer::start()
+int UDSServer::start()
 {
-    if(access(fileName.c_str(), F_OK) != 0) {
-        perror("access() error");
-        return 1;
+    if(access(fileName.c_str(), F_OK) == 0) {
+        unlink(fileName.c_str());
     }
-    unlink(fileName.c_str());
 
     sSock = socket(PF_FILE, SOCK_STREAM, 0);
     if(sSock == -1) {
@@ -44,6 +44,8 @@ UDSServer::start()
         return 1;
     }
 
+    std::cout << "listen..." << std::endl;
+
     cSize = sizeof(cAddr);
     cSock = accept(sSock, (struct sockaddr*)&cAddr, &cSize);
     if(cSock == -1) {
@@ -52,10 +54,21 @@ UDSServer::start()
     }
 
 
+    return 0;
 }
 
-UDSServer::close()
+int UDSServer::close()
 {
-    close(cSock);
-    close(sSock);
+    ::close(cSock);
+    ::close(sSock);
+
+    return 0;
+}
+
+int UDSServer::sendFloat(float data)
+{
+    float buf = data;
+    write(cSock, &buf, sizeof(float));
+
+    return 0;
 }

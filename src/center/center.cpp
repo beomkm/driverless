@@ -10,7 +10,7 @@
 namespace chro = std::chrono;
 namespace tthr = std::this_thread;
 
-int main(void)
+int main()
 {
 	//PCU와 시리얼 연결 설정
 	Control control("/dev/ttyUSB0");

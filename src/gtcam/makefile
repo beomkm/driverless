@@ -1,6 +1,5 @@
 all: main
 
-#for recipe 'clean'
 SHELL:=/bin/bash -O extglob
 
 #CC = gcc
@@ -13,7 +12,7 @@ CFLAGS = -Wall -O1 -g -std=gnu++11
 #CFLAGS = -03 -std=gnu++11
 
 #libraries
-LIBS = -L ./$(BINDIR) -llanetr -lpthread
+LIBS = -L ./$(BINDIR) -llanetr -ludsserver -lpthread
 
 #includes
 INCL = -I /usr/local/include/eigen3/
@@ -27,7 +26,10 @@ BINDIR = bin
 _OBJS = LaneDetector.o LaneModels.o
 OBJS = $(patsubst %,$(BINDIR)/%,$(_OBJS))
 
-main: main.cpp $(BINDIR)/liblanetr.a
+_OBJS_UDS = ../../common/UDSServer.o
+OBJS_UDS = $(patsubst %,$(BINDIR)/%,$(_OBJS_UDS))
+
+main: main.cpp $(BINDIR)/liblanetr.a $(BINDIR)/libudsserver.a
 	$(CC) $(CFLAGS) -o $(BINDIR)/main.elf main.cpp $(LIBS) $(OCVLIBS)
 
 $(BINDIR)/%.o: %.cpp %.hpp
@@ -36,6 +38,10 @@ $(BINDIR)/%.o: %.cpp %.hpp
 
 $(BINDIR)/liblanetr.a: $(OBJS)
 	ar crv $@ $^
+
+$(BINDIR)/libudsserver.a: $(OBJS_UDS)
+	ar crv $@ $^
+
 
 clean:
 	rm $(BINDIR)/!(tracking.mp4)
