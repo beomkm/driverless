@@ -38,7 +38,8 @@ int main()
 	std::cout << "Frame Size = " << dWidth << "x" << dHeight << std::endl;
 
 	Size frameSize(static_cast<int>(dWidth), static_cast<int>(dHeight));
-
+	namedWindow("Processed Video", 0);
+	resizeWindow("Processed Video",640,480);
 	// Declare matrices
 	Mat frame, gpu_frame_output;
 	cuda::GpuMat gpu_frame_input;
@@ -83,6 +84,7 @@ int main()
 
 		//writer.write(local);
 		imshow("Processed Video", local);
+
 
 		key_pressed = waitKey(25);
 	}

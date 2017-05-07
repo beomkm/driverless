@@ -10,12 +10,12 @@ CFLAGS = -Wall -O1 -g -std=gnu++11
 #CFLAGS = -03 -std=gnu++11
 
 #libraries
-LIBS = -L ./$(BINDIR) -lcenter -ludsclient -lpthread 
+LIBS = -L ./$(BINDIR) -lcenter -ludsclient -lpthread
 
 #dir
 BINDIR = bin
 
-_OBJS = Serial.o Control.o Receiver.o
+_OBJS = Serial.o Control.o Receiver.o PID.o
 OBJS = $(patsubst %,$(BINDIR)/%,$(_OBJS))
 
 _OBJS_UDS = ../../common/UDSClient.o

@@ -3,16 +3,20 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include <iomanip>
 
 #include "Serial.hpp"
 #include "Control.hpp"
 #include "../common/UDSClient.hpp"
+#include "PID.hpp"
 
 namespace chro = std::chrono;
 namespace tthr = std::this_thread;
 
 int main()
 {
+
+	PID pid;
 
 	UDSClient client("/tmp/gtserver");
 	client.start();
@@ -28,8 +32,16 @@ int main()
 	std::cout << "Central process on" << std::endl;
 
 	control.setMode(Mode::AUTO);
+	float temp;
+	int tempPID;
 	for(;loopFlag;) {
-		std::cout << client.recvFloat() << std::endl;
+		temp = client.recvFloat();
+		tempPID = pid.process(temp);
+		std::cout << std::setw(10) << temp;
+		std::cout << std::setw(10) << tempPID << std::endl;
+
+		control.setSteer(tempPID);
+
 		/*
 		command = getchar();
 		switch(command) {
