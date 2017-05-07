@@ -22,6 +22,7 @@ int main()
 
 	std::cout << "Central process on" << std::endl;
 
+	control.setMode(Mode::AUTO);
 	for(;loopFlag;) {
 		command = getchar();
 		switch(command) {
@@ -37,6 +38,7 @@ int main()
 				break;
 		}
 	}
+
 
 	control.end();
 	control.stopThread();

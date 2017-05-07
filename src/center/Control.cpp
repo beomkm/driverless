@@ -24,7 +24,6 @@ Control::Control(std::string devPath)
 	setSteer(0);
 	setBraking(0);
 
-	startThread();
 }
 
 
@@ -45,9 +44,10 @@ void Control::inFunc()
 	for(;threadFlag;) {
 		waitUpdate();
 		alive = getAlive();
+		sendCommand();
 		system("clear");
 		std::cout << toString() << std::endl;
-		exFunc();
+		//exFunc();
 	}
 }
 
@@ -58,6 +58,7 @@ void Control::setHandler(void (*pf)())
 int Control::start()
 {
 	serial.open();
+	startThread();
 	return 0;
 }
 

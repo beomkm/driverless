@@ -7,6 +7,7 @@
 #include <termios.h>
 #include <unistd.h>
 
+
 #include "Serial.hpp"
 
 Serial::Serial(const char *port, int baud, int bits, bool parity, Newline newline)
@@ -99,7 +100,7 @@ Serial::Serial(const char *port, int baud, int bits, bool parity, Newline newlin
 
 Serial::~Serial()
 {
-	close();
+	this->close();
 }
 
 //시리얼포트 오픈
@@ -110,10 +111,10 @@ int Serial::open()
 		perror("Failed to open port.");
 		exit(1);
 	}
-
 	tcflush(fd, TCIFLUSH);
 	tcsetattr(fd, TCSANOW, &config);
 
+	printf("serial ready\n");
 	return 0;
 }
 

@@ -2,6 +2,7 @@
 
 #include <unistd.h>
 #include <termios.h>
+#include <iostream>
 
 enum class Newline
 {
