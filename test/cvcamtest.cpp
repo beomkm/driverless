@@ -11,7 +11,7 @@ int main()
     IplImage* dest = NULL;
     IplImage* image = NULL;
     IplImage* image2 = NULL;
-    CvCapture* capture = cvCaptureFromCAM(1);
+    CvCapture* capture = cvCaptureFromCAM(0);
 
     cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, 640);
     cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT, 480);
