@@ -1,4 +1,5 @@
 all: main
+.PHONY: clean
 
 SHELL:=/bin/bash -O extglob
 
@@ -12,36 +13,37 @@ CFLAGS = -Wall -O1 -g -std=gnu++11
 #CFLAGS = -03 -std=gnu++11
 
 #libraries
-LIBS = -L ./$(BINDIR) -llanetr -ludsserver -lpthread
+LIBS = `pkg-config opencv --libs` \
+        -lpthread \
+		-L ./$(BINDIR) -ludsserver
 
 #includes
-INCL = -I /usr/local/include/eigen3/
-
-#open cv
-OCVLIBS = `pkg-config opencv --cflags --libs`
+INCL = -I./ `pkg-config opencv --cflags` \
+        -I /usr/local/include/eigen3/
 
 #dir
 BINDIR = bin
 
-_OBJS = LaneDetector.o LaneModels.o
+HEADER = $(wildcard ./*.h) \
+		$(wildcard ./*.hpp)
+
+_OBJS = LaneDetector.o \
+		LaneModels.o \
+		main.o
 OBJS = $(patsubst %,$(BINDIR)/%,$(_OBJS))
 
 _OBJS_UDS = ../../common/UDSServer.o
 OBJS_UDS = $(patsubst %,$(BINDIR)/%,$(_OBJS_UDS))
 
-main: main.cpp $(BINDIR)/liblanetr.a $(BINDIR)/libudsserver.a
-	$(CC) $(CFLAGS) -o $(BINDIR)/main.elf main.cpp $(LIBS) $(OCVLIBS)
+main: main.cpp $(OBJS) $(BINDIR)/libudsserver.a
+	$(CC) $(CFLAGS) -o $(BINDIR)/main.elf $(OBJS) $(LIBS)
 
-$(BINDIR)/%.o: %.cpp %.hpp
+$(BINDIR)/%.o: %.cpp $(HEADER)
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) -c $< -o $@ $(INCL) $(OCVLIBS)
-
-$(BINDIR)/liblanetr.a: $(OBJS)
-	ar crv $@ $^
+	$(CC) $(CFLAGS) -c $< -o $@ $(INCL)
 
 $(BINDIR)/libudsserver.a: $(OBJS_UDS)
 	ar crv $@ $^
-
 
 clean:
 	rm $(BINDIR)/!(tracking.mp4)

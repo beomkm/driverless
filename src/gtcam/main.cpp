@@ -19,7 +19,7 @@ int main()
 {
 
 	UDSServer server("/tmp/gtserver");
-	server.start();
+	//server.start();
 	std::cout << "uds on" << std::endl;
 
 	int key_pressed = 0;
@@ -80,7 +80,7 @@ int main()
 
 		//out << " ";
 
-		server.sendFloat(640.0f - center);
+		//server.sendFloat(640.0f - center);
 
 		//writer.write(local);
 		imshow("Processed Video", local);
@@ -89,6 +89,6 @@ int main()
 		key_pressed = waitKey(25);
 	}
 
-	server.close();
+	//server.close();
 	//out.close();
 }
