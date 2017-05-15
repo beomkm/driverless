@@ -22,9 +22,7 @@ int main()
     //cvNamedWindow("OpenCvCamtest", 0);
     //cvResizeWindow("OpenCvCamtest", 640, 480);
 
-
     while(1) {
-
         vc >> img;
         if(img.empty()) continue;
 

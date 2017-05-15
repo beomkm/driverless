@@ -1,6 +1,7 @@
 #include <cstring>
 #include <string>
 #include <iostream>
+#include <ctime>
 
 #include "Control.hpp"
 #include "Serial.hpp"
@@ -41,12 +42,14 @@ void Control::startThread()
 void Control::inFunc()
 {
 	int alive;
-	for(;threadFlag;) {
+	std::cout<<"aa"<<std::endl;
+
+	for(;threadFlag=1;) {
 		waitUpdate();
 		alive = getAlive();
 		sendCommand();
-		//system("clear");
-		//std::cout << toString() << std::endl;
+		system("clear");
+		std::cout << toString() << std::endl;
 		//exFunc();
 	}
 }
@@ -141,6 +144,15 @@ std::string Control::toString()
 	ret += "STEER : " + std::to_string(steer) + "\n";
 	ret += "BRAKE : " + std::to_string(braking) + "\n";
 	ret += "ENC : "   + std::to_string(encoder) + "\n";
+/*
+	ret += std::to_string(time(NULL));
+	ret += "\t";
+	ret += std::to_string(speed);
+	ret += "\t";
+	ret += std::to_string(steer);
+	ret += "\t";
+	ret += std::to_string(braking);
+*/
 
 	return ret;
 }
