@@ -35,17 +35,17 @@
 #include "VimbaCPP/Include/VimbaCPP.h"
 #include "ApiController.h"
 
+
+AVT::VmbAPI::Examples::ApiController apiController;
+
+int stopAcquisition();
+
 int main( int argc, char* argv[] )
 {
     VmbErrorType err = VmbErrorSuccess;
 
-    std::cout<<"///////////////////////////////////////////\n";
-    std::cout<<"/// Vimba API Asynchronous Grab Example ///\n";
-    std::cout<<"///////////////////////////////////////////\n\n";
+    std::cout<<"Vimba API Started\n";
 
-    //////////////////////
-    //Parse command line//
-    //////////////////////
     AVT::VmbAPI::Examples::ProgramConfig Config;
     err = Config.ParseCommandline( argc, argv);
     //Write out an error if we could not parse the command line
@@ -62,7 +62,6 @@ int main( int argc, char* argv[] )
     }
     else
     {
-        AVT::VmbAPI::Examples::ApiController apiController;
 
         // Print out version of Vimba
         std::cout<<"Vimba Version V"<<apiController.GetVersion()<<"\n";
@@ -98,12 +97,11 @@ int main( int argc, char* argv[] )
                 {
                     std::cout<< "Press <enter> to stop acquisition...\n" ;
                     getchar();
+					stopAcquisition();
+					std::cout<< "seg" << std::endl;
 
-                    apiController.StopContinuousImageAcquisition();
                 }
             }
-
-            apiController.ShutDown();
         }
 
         if ( VmbErrorSuccess == err )
@@ -118,4 +116,12 @@ int main( int argc, char* argv[] )
     }
 
     return err;
+}
+
+int stopAcquisition()
+{
+    apiController.StopContinuousImageAcquisition();
+    apiController.ShutDown();
+    std::cout<<"\nAcquisition stopped. (function)\n" ;
+	return 0;
 }

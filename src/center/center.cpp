@@ -18,12 +18,12 @@ int main()
 
 	PID pid;
 
-	//UDSClient client("/tmp/gtserver");
-	//client.start();
+	UDSClient client("/tmp/gtserver");
+	client.start();
 
 	//PCU와 시리얼 연결 설정
 	Control control("/dev/ttyUSB0");
-	control.start();
+	//control.start();
 
 	char command;
 	bool loopFlag = true;
@@ -35,15 +35,15 @@ int main()
 	float temp;
 	int tempPID;
 	for(;loopFlag;) {
-		/*temp = client.recvFloat();
+		temp = client.recvFloat();
 		tempPID = pid.process(temp);
 		std::cout << std::setw(10) << temp;
 		std::cout << std::setw(10) << tempPID << std::endl;
 
 		control.setSteer(tempPID);
-		*/
+		
 
-		command = getchar();
+		//command = getchar();
 		switch(command) {
 			//프로그램 종료
 			case 'q':
@@ -59,6 +59,8 @@ int main()
 				std::cout << "input power : ";
 				std::cin >> input;
 				control.setSpeed(input);
+				break;
+			default:
 				break;
 		}
 	}

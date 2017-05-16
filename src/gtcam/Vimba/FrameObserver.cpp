@@ -366,6 +366,19 @@ void FrameObserver::FrameReceived( const FramePtr pFrame )
                     cv::namedWindow("cam", cv::WINDOW_NORMAL);
                     cv::resizeWindow("cam", 640, 480);
                     imshow("cam", m);
+
+					if(!flag) {
+						std::cout << "recording.." << std::endl;
+						cv::Size size = cv::Size(nWidth, nHeight);
+						outputVideo.open("output.avi", cv::VideoWriter::fourcc('X', 'V', 'I', 'D'), 18, size, true);
+						if(!outputVideo.isOpened()) {
+							std::cout << "video err!" << std::endl;
+							return;
+						}
+
+						flag = true;
+					}
+					outputVideo << m;
                     cvWaitKey(10);
                 }
                 else

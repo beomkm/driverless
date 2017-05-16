@@ -4,6 +4,9 @@
 class PID
 {
 private:
+
+    bool prescale_flag = false;
+
     float data;
     float scale;
     float error_total;
@@ -12,6 +15,7 @@ private:
     float error=0.0f;
     float error_integral=0.0f;
     float filtering=0.0f;
+    float pre_scale;
     //initial value setting
 
     float cycle_time=0.015f;
@@ -21,7 +25,7 @@ private:
     //filtering alpha value
 
     float Kp=6.0f;
-    float Ki=1.5f;
+    float Ki=0.0f;
     float Kd=0.01f;
     //P, I, D setting
 

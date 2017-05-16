@@ -1,7 +1,9 @@
 
 
 #include "PID.hpp"
-
+#include <cmath>
+#include <cstdlib>
+#include <iostream>
 PID::PID()
 {
 }
@@ -12,13 +14,16 @@ PID::~PID()
 
 int PID::process(float input)
 {
+    if(!prescale_flag) {
+        pre_scale = input;
+        prescale_flag = true;
+    }
+
     scale = input;
-    if(scale > 40){
-        scale = 40;
+    if(std::abs(scale-pre_scale)>15){
+        scale=pre_scale;
     }
-    else if(scale < -40){
-        scale = -40;
-    }
+    std::cout << "used scale : "<<scale << std::endl;
     filtering = (1-alpha)*filtering+alpha*scale; //filtering
 
     data=filtering; //필터링 된 data
@@ -29,12 +34,13 @@ int PID::process(float input)
     error_integral=error_integral+error*cycle_time;
     p_error = error;
 
-    steering = error_total*15;
+    steering = error_total*10;
     if(steering > 2000){
         steering = 2000;
     }
     else if(steering < -2000){
         steering = -2000;
     }
+    pre_scale = scale;
     return steering; //scale 변화 상수 조절 // out input value
 }

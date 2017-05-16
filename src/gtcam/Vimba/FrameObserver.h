@@ -29,6 +29,7 @@
 #ifndef AVT_VMBAPI_EXAMPLES_FRAMEOBSERVER
 #define AVT_VMBAPI_EXAMPLES_FRAMEOBSERVER
 
+#include <opencv2/opencv.hpp>
 #include <queue>
 #include "VimbaCPP/Include/VimbaCPP.h"
 #include "ProgramConfig.h"
@@ -64,6 +65,8 @@ public:
     virtual void FrameReceived( const FramePtr pFrame );
 
 private:
+	cv::VideoWriter outputVideo;
+	bool flag = false;
     void ShowFrameInfos( const FramePtr & );
     double GetTime();
     template <typename T>
