@@ -15,11 +15,17 @@ CFLAGS = -Wall -O1 -g -std=gnu++11
 #libraries
 LIBS = `pkg-config opencv --libs` \
         -lpthread \
-		-L ./$(BINDIR) -ludsserver
+		-L ./$(BINDIR) -ludsserver \
+		-L ./Vimba/bin -lvimba  \
+		-L ./Vimba -lVimbaC  \
+		-L ./Vimba -lVimbaCPP  \
+		-L ./Vimba -lVimbaImageTransform  
+		
 
 #includes
 INCL = -I./ `pkg-config opencv --cflags` \
-        -I /usr/local/include/eigen3/
+        -I /usr/local/include/eigen3/ \
+		-I ./Vimba/
 
 #dir
 BINDIR = bin

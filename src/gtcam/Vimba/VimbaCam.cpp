@@ -31,16 +31,12 @@
 #include <iostream>
 
 
-
 #include "VimbaCPP/Include/VimbaCPP.h"
 #include "ApiController.h"
+#include "VimbaCam.hpp"
 
 
-AVT::VmbAPI::Examples::ApiController apiController;
-
-int stopAcquisition();
-
-int main( int argc, char* argv[] )
+int VimbaCam::start()
 {
     VmbErrorType err = VmbErrorSuccess;
 
@@ -112,12 +108,11 @@ int main( int argc, char* argv[] )
         }
     }
 
-	getchar();
-
     return err;
 }
 
-int stopAcquisition()
+
+int VimbaCam::stopAcquisition()
 {
     apiController.StopContinuousImageAcquisition();
     apiController.ShutDown();

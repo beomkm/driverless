@@ -35,7 +35,7 @@
 #endif //WIN32
 
 #include "FrameObserver.h"
-
+#include "FrameEvent.hpp"
 #include "TransformImage.h"
 
 #include <opencv2/core/core.hpp>
@@ -68,6 +68,7 @@ FrameObserver::FrameObserver( CameraPtr pCamera, FrameInfos eFrameInfos, ColorPr
     QueryPerformanceFrequency( &nFrequency );
     m_dFrequency = (double)nFrequency.QuadPart;
 #endif //WIN32
+    frameEvent = FrameEvent::getInstance();
 }
 
 //
@@ -311,7 +312,6 @@ void FrameObserver::ShowFrameInfos( const FramePtr &pFrame )
 //
 void FrameObserver::FrameReceived( const FramePtr pFrame )
 {
-
     if(! SP_ISNULL( pFrame ) )
     {
         if( FrameInfos_Off != m_eFrameInfos )
@@ -363,11 +363,14 @@ void FrameObserver::FrameReceived( const FramePtr pFrame )
                     //std::cout << nWidth << " " << nHeight << std::endl;
                     cv::Mat m = cv::Mat(nHeight, nWidth, CV_8UC3);
                     memcpy(m.data, TransformedData.data(), TransformedData.size()*sizeof(VmbUchar_t));
-                    cv::namedWindow("cam", cv::WINDOW_NORMAL);
-                    cv::resizeWindow("cam", 640, 480);
-                    imshow("cam", m);
+                    //cv::namedWindow("cam", cv::WINDOW_NORMAL);
+                    //cv::resizeWindow("cam", 640, 480);
+                    //imshow("cam", m);
 
-					if(!flag) {
+                    if(frameEvent->callback != nullptr)
+                        frameEvent->callback(m);
+
+					if(0==1 && !flag) {
 						std::cout << "recording.." << std::endl;
 						cv::Size size = cv::Size(nWidth, nHeight);
 						outputVideo.open("output.avi", cv::VideoWriter::fourcc('X', 'V', 'I', 'D'), 18, size, true);
@@ -378,7 +381,9 @@ void FrameObserver::FrameReceived( const FramePtr pFrame )
 
 						flag = true;
 					}
-					outputVideo << m;
+                    if(0==1 && flag) {
+                        outputVideo << m;
+                    }
                     cvWaitKey(10);
                 }
                 else

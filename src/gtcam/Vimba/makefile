@@ -26,12 +26,14 @@ BINDIR = bin
 
 _OBJS = FrameObserver.o \
 		ApiController.o \
-		program.o
+		FrameEvent.o \
+		VimbaCam.o
 
 OBJS = $(patsubst %,$(BINDIR)/%,$(_OBJS))
 
-main: program.cpp $(OBJS)
-	$(CC) $(CFLAGS) -o $(BINDIR)/program.elf $(OBJS) $(LIBS)
+main: $(OBJS)
+	#$(CC) $(CFLAGS) -o $(BINDIR)/program.elf $(OBJS) $(LIBS)
+	ar crv $(BINDIR)/libvimba.a $^
 
 $(BINDIR)/%.o: %.cpp
 	mkdir -p $(BINDIR)

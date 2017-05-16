@@ -33,6 +33,7 @@
 #include <queue>
 #include "VimbaCPP/Include/VimbaCPP.h"
 #include "ProgramConfig.h"
+#include "FrameEvent.hpp"
 #ifdef WIN32
 #include <Windows.h>
 #endif //WIN32
@@ -65,6 +66,7 @@ public:
     virtual void FrameReceived( const FramePtr pFrame );
 
 private:
+    FrameEvent *frameEvent;
 	cv::VideoWriter outputVideo;
 	bool flag = false;
     void ShowFrameInfos( const FramePtr & );
