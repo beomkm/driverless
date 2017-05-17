@@ -32,7 +32,7 @@ public:
 				aux -= raw[x - tau_];
 				aux -= raw[x + tau_];
 
-				aux -= abs(raw[x - tau_] - raw[x + tau_]);
+				aux -= std::abs(raw[x - tau_] - raw[x + tau_]);
 
 				aux *= 4;// more contrast
 

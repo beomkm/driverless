@@ -11,6 +11,8 @@
 #include <Eigen/Dense>
 #include <iostream>
 
+#define PI 3.141592
+
 double center;
 double curvature;
 
@@ -24,12 +26,24 @@ LaneDetector::LaneDetector()
 
 }
 
+void Mymouse(int event, int x, int y, int flag, void* param)
+{
+	int startX, startY;
+	switch (event) {
+		case CV_EVENT_LBUTTONDOWN:
+		std::cout << "Left button down X= " << x/2 << ", Y= " << y/2 << std::endl;
+		startX = x;
+		startY = y;
+		break;
+	}
+}
+
 void LaneDetector::ComputePerspectiveTransformationMatrix(const int width, const int height)
 {
 	cv::Point2f src[] =
 	{
-		{ 0,       470 },							//top-left
-		{ 1280,    470 },							//top -right
+		{ 0,       730 },							//top-left
+		{ 1280,    730 },							//top -right
 		{ 0,       static_cast<float>(height) },	//bottom-left
 		{ 1280 - 100,    static_cast<float>(height) }//bottom-right
 	};
@@ -72,7 +86,7 @@ cv::cuda::GpuMat LaneDetector::GetRoadOnlyImage(const cv::cuda::GpuMat& input)
 cv::cuda::GpuMat LaneDetector::SetRoI(const cv::cuda::GpuMat& input)
 {
 	cv::cuda::GpuMat road(input.clone());
-	cv::Rect roi_out(input.cols * 2 / 7 + 50, 0, input.cols * 3 / 7 - 10, input.rows);// ���ɿ��� ����
+	cv::Rect roi_out(input.cols * 2 / 7 -150, 0, input.cols * 4 / 7 + 80, input.rows);// ���ɿ��� ����
 	cv::cuda::GpuMat RoI = road(roi_out);
 
 	return RoI;
@@ -83,7 +97,7 @@ cv::Mat LaneDetector::RoIBack(const cv::cuda::GpuMat& base, const cv::Mat& input
 	cv::Mat road;
 	base.download(road);
 	cv::Mat background = cv::Mat::zeros(base.rows, base.cols, CV_8UC1);
-	cv::Rect roi_out(road.cols * 2 / 7 + 50, 0, road.cols * 3 / 7 - 10, road.rows);// ���ɿ��� ����
+	cv::Rect roi_out(road.cols * 2 / 7 -150, 0, road.cols * 4 / 7 + 80, road.rows);// ���ɿ��� ����
 	cv::Mat RoIMat = background(roi_out);
 	cv::Mat mask = input;
 
@@ -156,7 +170,7 @@ void BuildCurrentLaneModel(RoadModel& roadModel)
 {
 	roadModel.current_lane_model_.valid = false;
 
-	const int ROAD_WIDTH = 250;
+	const int ROAD_WIDTH = 350;
 
 	if (roadModel.current_lane_left.size() == 1 && roadModel.current_lane_right.size() == 1)
 	{
@@ -168,14 +182,14 @@ void BuildCurrentLaneModel(RoadModel& roadModel)
 	}
 	else if (roadModel.current_lane_left.size() == 1 && roadModel.current_lane_right.size() == 0)
 	{
-		roadModel.current_lane_model_.left_ = roadModel.current_lane_left[1];
-		roadModel.current_lane_model_.right_ = lane_model::Parabola(roadModel.current_lane_left[0].a, roadModel.current_lane_left[0].b, roadModel.current_lane_left[0].c + ROAD_WIDTH * 3 / 5);
-		roadModel.current_lane_model_.center = lane_model::Parabola(roadModel.current_lane_left[0].a, roadModel.current_lane_left[0].b, roadModel.current_lane_left[0].c + ROAD_WIDTH * 3 / 10);
+		roadModel.current_lane_model_.left_ = roadModel.current_lane_left[0];
+		roadModel.current_lane_model_.right_ = lane_model::Parabola(roadModel.current_lane_left[0].a, roadModel.current_lane_left[0].b, roadModel.current_lane_left[0].c + ROAD_WIDTH * 3 / 5 - 17);
+		roadModel.current_lane_model_.center = lane_model::Parabola(roadModel.current_lane_left[0].a, roadModel.current_lane_left[0].b, roadModel.current_lane_left[0].c + ROAD_WIDTH * 3 / 10 - 34);
 	}
 	else if (roadModel.current_lane_left.size() == 0 && roadModel.current_lane_right.size() == 1)
 	{
-		roadModel.current_lane_model_.left_ = lane_model::Parabola(roadModel.current_lane_right[0].a, roadModel.current_lane_right[0].b, roadModel.current_lane_right[0].c - ROAD_WIDTH * 3 / 5);
-		roadModel.current_lane_model_.center = lane_model::Parabola(roadModel.current_lane_right[0].a, roadModel.current_lane_right[0].b, roadModel.current_lane_right[0].c - ROAD_WIDTH * 3 / 10);
+		roadModel.current_lane_model_.left_ = lane_model::Parabola(roadModel.current_lane_right[0].a, roadModel.current_lane_right[0].b, roadModel.current_lane_right[0].c - ROAD_WIDTH * 3 / 5 + 17);
+		roadModel.current_lane_model_.center = lane_model::Parabola(roadModel.current_lane_right[0].a, roadModel.current_lane_right[0].b, roadModel.current_lane_right[0].c - ROAD_WIDTH * 3 / 10 + 34);
 		roadModel.current_lane_model_.right_ = roadModel.current_lane_right[0];
 	}
 	else return;
@@ -195,7 +209,7 @@ void Drawlane(cv::Mat& image, const lane_model::Parabola& parabola, const cv::Ve
 		int x_1 = x;
 		cv::Vec3b* data = image.ptr<cv::Vec3b>(y);
 
-		if (x > 0 && x < 1280 && y > 200 && y < 740)
+		if (x > 0 && x < 1280 && y > 200 && y < 960)
 		{
 			data[x_1 - 3] = color;
 			data[x_1 - 2] = color;
@@ -215,7 +229,7 @@ void DrawCenter(cv::Mat& image, const lane_model::Parabola& parabola, const cv::
 	auto p = lane_model::Parabola(parabola.a * 0.25 * 2, parabola.b * 0.5 * 2, parabola.c * 2); // upscale
 	double y0 = 720;
 	double y1 = 0;
-	double y2 = 300;
+	double y2 = 100;
 
 	y1 = (y1 + y2) / 2;
 
@@ -223,28 +237,17 @@ void DrawCenter(cv::Mat& image, const lane_model::Parabola& parabola, const cv::
 	double x1 = p(y1);
 	double x2 = p(y2);
 
+	float a = sqrt(pow((x0 - x1), 2) + pow((y0 - y1), 2));
+	float b = sqrt(pow((x1 - x2), 2) + pow((y1 - y2), 2));
+	float c = sqrt(pow((x2 - x0), 2) + pow((y2 - y0), 2));
+
+	float cos_A = (pow(b, 2) + pow(c, 2) - pow(a, 2)) / (2 * b * c);
+	float alpha = acos(cos_A);
+	float sin_A = cos(alpha - PI / 2);
+
 	if (x0 != x1 && x1 != x2) {
-		MatrixXd A = MatrixXd(3, 3);
-		A(0, 0) = x0;
-		A(0, 1) = y0;
-		A(0, 2) = 1;
-		A(1, 0) = x1;
-		A(1, 1) = y1;
-		A(1, 2) = 1;
-		A(2, 0) = x2;
-		A(2, 1) = y2;
-		A(2, 2) = 1;
-
-		MatrixXd B = MatrixXd(3, 1);
-		B(0, 0) = -(pow(x0, 2) + pow(y0, 2));
-		B(1, 0) = -(pow(x1, 2) + pow(y1, 2));
-		B(2, 0) = -(pow(x2, 2) + pow(y2, 2));
-
-		MatrixXd C = MatrixXd(3, 1);
-		C = A.inverse() * pow(x0, 2);
-
-		double radius = sqrt(pow((0, 0), 2) + pow((1, 0), 2) - C(2, 0));
-		curvature = 1 / radius;
+		double radius = a / (2 * sin_A);
+		curvature = 1 / radius * 1000;
 	}
 	else {
 		curvature = 0;
@@ -258,7 +261,7 @@ void DrawCenter(cv::Mat& image, const lane_model::Parabola& parabola, const cv::
 		int x_1 = x;
 		cv::Vec3b* data = image.ptr<cv::Vec3b>(y);
 
-		if (x > 0 && x < 1280 && y > 480 && y < 720)
+		if (x > 0 && x < 1280 && y > 600 && y < 955)
 		{
 			data[x_1 - 2] = color;
 			data[x_1 - 1] = color;
@@ -280,7 +283,7 @@ void DrawCenter_line(cv::Mat& image, const lane_model::Parabola& parabola, const
 		const auto x = p(y) + gap;
 		int x_1 = x;
 		cv::Vec3b* data = image.ptr<cv::Vec3b>(y);
-		if (x > 0 && x < 1280 && y > 640 && y < 705)
+		if (x > 0 && x < 1280 && y > 800 && y < 940)
 		{
 			data[x_1-1] = color;
 			data[x_1] = color;
@@ -300,6 +303,7 @@ RoadModel LaneDetector::BuildRoadModelFromPoints(const std::vector<cv::Point2f>&
 	roadModel.lanes_left = pointsToLanesCovnerter.Convert_left(points);
 	roadModel.lanes_right = pointsToLanesCovnerter.Convert_right(points);
 	roadModel.invPerspTransform = invPerspectiveTransform;
+	if (roadModel.lanes_left.size() == 0 && roadModel.lanes_right.size() == 0) throw 1;
 
 	DetectCurrentLane(roadModel);
 	BuildCurrentLaneModel(roadModel);
@@ -333,6 +337,12 @@ RoadModel LaneDetector::DetectLane(cv::Mat& inputFrame)
 	auto points      = ConvertImageToPoints(DownsampleImageByHalf(result));
 	auto roadModel   = BuildRoadModelFromPoints(points);
 
+	cv::Mat down;
+	// lanesPixels.download(down);
+	//cv::namedWindow("filter", 0);
+	//cv::resizeWindow("filter",640,480);
+	//cv::imshow("filter", lanesPixels);
+	//cv::setMouseCallback("filter", Mymouse);
 	/////////////////////////////////////////
 	cv::Mat background = cv::Mat::zeros(result.rows, result.cols, CV_8UC3);
 
@@ -343,7 +353,7 @@ RoadModel LaneDetector::DetectLane(cv::Mat& inputFrame)
 		Drawlane(background, roadModel.current_lane_model_.left_, { 0,255,0 });
 		Drawlane(background, roadModel.current_lane_model_.right_, { 0,255,0 });
 	}
-
+	//cv::imshow("filter1", background);
 	cv::cuda::GpuMat background_gpu;;
 	background_gpu.upload(background);
 

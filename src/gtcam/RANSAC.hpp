@@ -5,7 +5,7 @@
 /// Model is valid when it's not degenerated (all 0's) or is too much curved
 inline bool IsModelValid(vision::lane_model::Parabola& parabola)
 {
-	return abs(parabola.a) <= 0.0007 && (parabola.a != 0 && parabola.b != 0 && parabola.c != 0);
+	return std::abs(parabola.a) <= 0.0007 && (parabola.a != 0 && parabola.b != 0 && parabola.c != 0);
 }
 
 vision::lane_model::Parabola RANSAC_Parabola(int iterations, int init_samples, int n, double error_threshold, std::vector<cv::Point2f> inputData)
@@ -28,11 +28,11 @@ vision::lane_model::Parabola RANSAC_Parabola(int iterations, int init_samples, i
 		auto straight_model_error = 0;
 		for (auto p : inputData)
 		{
-			const auto err = abs(model(p.y) - p.x);
+			const auto err = std::abs(model(p.y) - p.x);
 			if (err < error_threshold) {
 				consensus_set += 1;
 				model_error += err;
-				straight_model_error += abs(straight_model(p.y) - p.x);
+				straight_model_error += std::abs(straight_model(p.y) - p.x);
 			}
 		}
 

@@ -19,8 +19,8 @@ LIBS = `pkg-config opencv --libs` \
 		-L ./Vimba/bin -lvimba  \
 		-L ./Vimba -lVimbaC  \
 		-L ./Vimba -lVimbaCPP  \
-		-L ./Vimba -lVimbaImageTransform  
-		
+		-L ./Vimba -lVimbaImageTransform
+
 
 #includes
 INCL = -I./ `pkg-config opencv --cflags` \
@@ -51,5 +51,9 @@ $(BINDIR)/%.o: %.cpp $(HEADER)
 $(BINDIR)/libudsserver.a: $(OBJS_UDS)
 	ar crv $@ $^
 
+
+
 clean:
-	rm $(BINDIR)/!(tracking.mp4)
+	rm $(BINDIR)/*.o
+	rm $(BINDIR)/*.a
+	rm $(BINDIR)/*.elf

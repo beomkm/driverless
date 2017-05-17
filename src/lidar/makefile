@@ -2,7 +2,7 @@ CC = clang++
 
 
 Lidar.elf : LidarManager.o test.o
-	$(CC) -o Lidar.elf LidarManager.o test.o -L/usr/local/lib -lLMS1xx 
+	$(CC) -o Lidar.elf LidarManager.o test.o ../common/UDSServer.o -L/usr/local/lib -lLMS1xx 
 
 LidarManager.o : LidarManager.cpp
 	$(CC) -c -o LidarManager.o LidarManager.cpp -L/usr/local/lib -lLMS1xx 

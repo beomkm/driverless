@@ -3,8 +3,8 @@
 
 class PID
 {
-private:
 
+public:
     bool prescale_flag = false;
 
     float data;
@@ -25,16 +25,17 @@ private:
     //filtering alpha value
 
     float Kp=6.0f;
-    float Ki=0.0f;
-    float Kd=0.01f;
+    float Ki=1.5f;
+    float Kd=0.5f;
     //P, I, D setting
 
+	float coef = 3.0f;
     float steering;
 
 
-public:
 	PID();
 	~PID();
+	int init();
     int process(float input);
 
 };

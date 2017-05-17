@@ -3,19 +3,19 @@
 
 int main(void)
 {
-  LidarManager l;
-  l.setUpLidar();
-  printf("set up complete!\n");
-  l.start();
-  printf("start!\n");
+	LidarManager l;
+	l.setUpLidar();
+	printf("set up complete!\n");
+	l.start();
+	printf("start!\n");
 
-  while(1){
+	while(1){
 
-  l.run();
+		l.run();
 
-  }
+	}
 
 
-  l.stop();
+	l.stop();
 
 }

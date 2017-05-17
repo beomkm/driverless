@@ -48,8 +48,11 @@ void Control::inFunc()
 		waitUpdate();
 		alive = getAlive();
 		sendCommand();
-		system("clear");
-		std::cout << toString() << std::endl;
+		if(printFlag) {
+			system("clear");
+			std::cout << toString() << std::endl;	
+		}
+
 		//exFunc();
 	}
 }
@@ -112,8 +115,41 @@ int Control::waitUpdate()
 
 int Control::sendCommand()
 {
+	Action action;
+	if(!actionQueue.empty()) {
+		std::cout << "action" << std::endl;
+		action = actionQueue.front();
+		setGear(action.gear);
+		setSteer(action.steer);
+		setSpeed(action.speed);
+		action.dist -= getSpeed();
+		actionQueue.front().dist = action.dist;
+		if(action.dist <= 0)
+			actionQueue.pop();
+	}
+
 	sArr[11] += 1;
 	return serial.writeData(sArr, 14);
+}
+
+int Control::addAction(Gear gear, int steer, int speed, int time)
+{
+	Action action = {gear, steer, speed, 0};
+	for(int i=0; i<time; i++)
+		actionQueue.push(action);
+	return 0;
+}
+
+int Control::addAction2(Gear gear, int steer, int speed, int dist)
+{
+	Action action = {gear, steer, speed, dist};
+	actionQueue.push(action);
+	return 0;
+}
+
+bool Control::isBusy()
+{
+	return !actionQueue.empty();
 }
 
 std::string Control::toString()

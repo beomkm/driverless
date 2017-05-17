@@ -12,6 +12,16 @@ PID::~PID()
 {
 }
 
+int PID::init()
+{
+	goal = 0.0f;
+	p_error = 0.0f;
+	error = 0.0f;
+	error_integral = 0.0f;
+	filtering = 0.0f;	
+	return 0;
+}
+
 int PID::process(float input)
 {
     if(!prescale_flag) {
@@ -23,7 +33,7 @@ int PID::process(float input)
     if(std::abs(scale-pre_scale)>15){
         scale=pre_scale;
     }
-    std::cout << "used scale : "<<scale << std::endl;
+    //std::cout << "used scale : "<<scale << std::endl;
     filtering = (1-alpha)*filtering+alpha*scale; //filtering
 
     data=filtering; //필터링 된 data
@@ -34,7 +44,7 @@ int PID::process(float input)
     error_integral=error_integral+error*cycle_time;
     p_error = error;
 
-    steering = error_total*10;
+    steering = error_total*coef;
     if(steering > 2000){
         steering = 2000;
     }
