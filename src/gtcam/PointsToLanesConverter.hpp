@@ -11,6 +11,7 @@ namespace vision
 class PointsToLanesConverter
 {
 public:
+	int x_left = 0, x_right = 0;
 	std::vector<lane_model::Parabola> Convert_left(std::vector<cv::Point2f> points)
 	{
 		std::vector<lane_model::Parabola> model;
@@ -23,7 +24,7 @@ public:
 		bool standard = false;
 		bool initiate = false;
 		float x = 0, y = 0;
-		float x_old = 0;
+		float x_old = 0, x_lane = 0;
 		float y_old = 0;
 
 		int pointSize = points.size() - 1;
@@ -72,22 +73,26 @@ public:
 			if ((initiate == false) && (y != y_old)) initiate = true;
 			if (initiate == false)
 			{
-				if (std::abs(average_left - 240) < std::abs(x - 240))
+				if (std::abs(average_left - 280) < std::abs(x - 280))
 				{
 					x_old = x;
 					left_points.clear();
 					left_points.emplace_back(x, y);
+					x_left = x_old;
 				}
 			}
 
-
-			if (standard == false && (x < 270 && x > 200))
+			if (standard == false && (x < 340))
 			{
 				standard = true;
 				x_old = x;
 				left_points.emplace_back(x, y);
+				x_left = x_old;
 			}
+
+			//y_old = y;
 		}
+
 		//left point check
 		/*
 		for (int k = 0; k < left_points.size(); k++)
@@ -122,7 +127,7 @@ public:
 		bool standard = false;
 		bool initiate = false;
 		float x = 0, y = 0;
-		float x_old = 0;
+		float x_old = 0, x_lane =0;
 		float y_old = 0;
 
 		int pointSize = points.size() - 1;
@@ -176,16 +181,20 @@ public:
 					x_old = x;
 					right_points.clear();
 					right_points.emplace_back(x, y);
+					x_right = x_old;
 				}
 			}
 
 
-			if (standard == false && (x < 430 && x > 370))
+			if (standard == false && (x > 340))
 			{
 				standard = true;
 				x_old = x;
 				right_points.emplace_back(x, y);
+				x_right = x_old;
 			}
+
+			//y_old = y;
 		}
 
 		// right point check
@@ -198,6 +207,7 @@ public:
 			std::cout << x << "     " << y << std::endl;
 		}
 		*/
+
 		if (right_points.size() > 50)
 		{
 			auto parabola_right = RANSAC_Parabola(RANSAC_ITERATIONS, RANSAC_MODEL_SIZE, static_cast<int>(RANSAC_INLINERS * right_points.size()), RANSAC_ERROR_THRESHOLD, right_points);

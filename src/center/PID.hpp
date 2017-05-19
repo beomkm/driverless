@@ -18,18 +18,19 @@ public:
     float pre_scale;
     //initial value setting
 
+    //float cycle_time=0.015f;
     float cycle_time=0.015f;
     //1cycle time setting
 
     float alpha=0.05f;
     //filtering alpha value
 
-    float Kp=6.0f;
-    float Ki=1.5f;
-    float Kd=0.5f;
+    float Kp=5.0f;
+    float Ki=0.15f;
+    float Kd=0.00f;
     //P, I, D setting
 
-	float coef = 3.0f;
+	float coef = 3.5f;
     float steering;
 
 

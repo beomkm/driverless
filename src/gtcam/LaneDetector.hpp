@@ -36,20 +36,24 @@ namespace vision
 	public:
 		LaneDetector();
 		RoadModel DetectLane(cv::Mat& inputFrame);
+		int Inputsign(int input);
+		int SetSteering(int steer);
+		double stop_line_distance();
 		double FindingCenter();
+		//double FindingCentre();
 		double FindingCurvature();
+		double Parkgoal();
+		RoadModel build();
 
 	private:
 		cv::Mat FindPixelsThatMayBelongToLane(const cv::cuda::GpuMat& input);
-		cv::cuda::GpuMat GetRoadOnlyImage(const cv::cuda::GpuMat& input);
-		cv::cuda::GpuMat SetRoI(const cv::cuda::GpuMat& input);
-		cv::Mat RoIBack(const cv::cuda::GpuMat& base, const cv::Mat& input);
-		void ComputePerspectiveTransformationMatrix(const int width, const int height);
+
 		cv::Mat DownsampleImageByHalf(const cv::Mat& input);
-		RoadModel BuildRoadModelFromPoints(const std::vector<cv::Point2f>& points);
 
 		cv::Mat perspectiveTransform;
 		cv::Mat invPerspectiveTransform;
+
+		int steering = 0;
 	};
 
 

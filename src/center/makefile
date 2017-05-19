@@ -15,7 +15,7 @@ LIBS = -L ./$(BINDIR) -lcenter -ludsclient -lpthread
 #dir
 BINDIR = bin
 
-_OBJS = Serial.o Control.o Receiver.o PID.o
+_OBJS = Serial.o Control.o Receiver.o PID.o LidarManager.o LMS1xx.o
 OBJS = $(patsubst %,$(BINDIR)/%,$(_OBJS))
 
 _OBJS_UDS = ../../common/UDSClient.o

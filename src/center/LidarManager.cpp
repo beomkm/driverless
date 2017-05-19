@@ -1,8 +1,8 @@
-#include "LidarManager.h"
+#include "LidarManager.hpp"
 
 LidarManager::LidarManager()
 {
-	_mode		= ACT1;
+	_mode		= ACT2;
 	_status		= UNDEFINE;
 	setCritical(INIT_CRITICAL_AREA); // 3m
 	memset(_objects, 0, sizeof(_objects));
@@ -87,10 +87,12 @@ void LidarManager::interpolate()
 			_data.dist1[i] = LOSS_DATA;
 
 		// write object Data sheets...
+		/*
 		if (_data.dist1[i] <= _critical && _data.dist1[i] != LOSS_DATA)
 			_objects[i] = (_objects[i] + 1) % OBJECTRECOGMAXVAL;
 		else
 			_objects[i] = _objects[i] / 2;
+		*/
 	}
 }
 
@@ -108,8 +110,6 @@ void LidarManager::trace()
 	for (int i = USEAREA01; i < USEAREA02; i++)
 	{
 		int min_distance = 999999;
-		if(_objects[i] > OBJECTRECOGVAL){
-
 
 			object_start = i;
 
@@ -146,7 +146,7 @@ void LidarManager::trace()
 
 
 			fflush(stdout);
-		}
+
 	}
 
 	printf(" Count of Object : %d \n", object_count);
@@ -157,24 +157,37 @@ void LidarManager::trace()
 
 void LidarManager::traceWithAngle(int angle)
 {
-	int angle1 = 0;
-	int angle2 = 0;
 
-	if(_objects[270 - angle*2] > OBJECTRECOGVAL)
+	int minVal1 = 999999;
+	int minVal2 = 999999;
+
+	for(int i = 150 ; i< 270 ; i++)
 	{
-		printf(" [ 270 - THETA : Distance : %d] \n", _data.dist1[270 - angle*2]);
-		angle1 = 1;
-	}
-	if(_objects[270 + angle*2] > OBJECTRECOGVAL)
-	{
-	 	printf(" [ 270 + THETA : Distance : %d] \n", _data.dist1[270 + angle*2]);
-		angle2 = 1;
+			while(_data.dist1[i] < _critical)
+			{
+				minVal1 = minVal1 < _data.dist1[i] ? minVal1 : _data.dist1[i];
+				i++;
+			}
+			//printf(" %d - %d : minVal1 : %d \n", 270 - angle*2 , 270,minVal1);
 	}
 
-	if(angle1 == 1 && angle2 == 1)
+	for(int i= 270 ; i< 390 ; i++)
 	{
-		printf("gap : %d \n" , _data.dist1[270 + angle*2] - _data.dist1[270 - angle*2]);
+			while(_data.dist1[i]< _critical)
+			{
+				minVal2 = minVal2 < _data.dist1[i] ? minVal2 : _data.dist1[i];
+				i++;
+			}
+			//printf(" %d - %d : minVal2 : %d \n", 270  , 270 + angle*2,minVal2);
+
 	}
+	if(minVal1 == 999999) minVal1 = minVal2;
+	if(minVal2 == 999999) minVal2 = minVal1;
+	_gap = minVal2 - minVal1;
+	printf(" %d \n", _gap );
+
+
+
 }
 void LidarManager::update()
 {
@@ -202,15 +215,13 @@ void LidarManager::testData()
 void LidarManager::start()
 {
 	_device.startMeas();
-
-	/*
 	while (_status != READY_FOR_MEASURE)
 	{
 		_status = _device.queryStatus();
 		std::cout << "status : " << _status << std::endl;
 		sleep(1);
-	}*/
-	_device.startDevice();
+	}
+	//_device.startDevice();
 	_device.scanContinous(START);
 	printf("Start Scan...\n");
 }

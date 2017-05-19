@@ -72,3 +72,10 @@ int UDSServer::sendFloat(float data)
 
     return 0;
 }
+
+int UDSServer::recvInt()
+{
+	int buf;
+	read(cSock, &buf, sizeof(int));
+	return buf;
+}

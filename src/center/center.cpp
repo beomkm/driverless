@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iomanip>
 
+#include "LidarManager.hpp"
 #include "Serial.hpp"
 #include "Control.hpp"
 #include "../common/UDSClient.hpp"
@@ -16,12 +17,24 @@ namespace tthr = std::this_thread;
 bool pidPrintFlag = false;
 
 int cmdHandler();
+int lidarHandler();
 
+LidarManager l;
 Control control("/dev/ttyUSB0");
 PID pid;
 
+int mode = 0;
+//0 : Lane tracking
+//1 : Stop
+//2 : Narrow, S
+//3 : Parking
+
 int main()
 {
+	//l.setUpLidar();
+	printf("lidar set up complete!\n");
+	//l.start();
+	printf("lidar start!\n");
 
 	UDSClient client("/tmp/gtserver");
 	client.start();
@@ -30,38 +43,64 @@ int main()
 
 	control.start();
 
-
 	bool loopFlag = true;
 
 
 	std::thread cmdThread(cmdHandler);
+	//std::thread lidarThread(lidarHandler);
 
 	std::cout << "Central process on" << std::endl;
 
 	control.setMode(Mode::AUTO);
-	//control.setSpeed(15);
+	//control.setSpeed(25);
 	float temp;
+	float stopLine = 999;
+	float parkLine = 999;
+	float signInput;
 	int tempPID;
 	for(;loopFlag;) {
-		temp = client.recvFloat();
-		tthr::sleep_for(chro::milliseconds(10));
-		temp = 0;
+		if(mode == 0) {
+			temp = client.recvFloat();
+			//stopLine = client.recvFloat();
+			//parkLine = client.recvFloat();
+			if(parkLine < 20) {
+				//control.addAction2(Gear::FORWARD, 0, 20, 50);
+				//control.addAction(Gear::FORWARD, 0, 0, 40);
+			}
+			//signInput = client.recvFloat();
+			//client.sendInt(0); //0:steer, 1:inputsign
+			//client.sendInt(control.getSteer());
+		}
+		else if(mode == 2) {
+			temp = (float)l._gap/3.0f;
+		}
+
+		//tthr::sleep_for(chro::milliseconds(10));
 		if(control.getMode() == Mode::AUTO) {
-			tempPID = pid.process(temp);
+			if(mode == 0) {
+				tempPID = pid.process(temp);
+			}
+			else if(mode == 2) {
+				tempPID = temp*3.3;
+			}
 		}
 		else {
 			pid.init();
-			if(!control.isBusy()) 
+			if(!control.isBusy()) {
 				control.setSteer(0);
-
+			}
 		}
 		if(pidPrintFlag) {
-			std::cout << std::setw(10) << temp;
-			std::cout << std::setw(10) << tempPID << std::endl;
+			std::cout <<std::setw(10) << temp;
+			std::cout <<std::setw(10) << tempPID << std::endl;
 		}
 
-		if(!control.isBusy()) 
+		if(!control.isBusy()) {
+			if(tempPID > 2000) tempPID = 2000;
+			if(tempPID < -2000) tempPID = -2000;
+			std::cout << -tempPID << std::endl;
 			control.setSteer(-tempPID);
+		}
 
 	}
 
@@ -99,14 +138,13 @@ int cmdHandler()
 				control.setSpeed(input);
 				break;
 			case '1':
-				control.addAction(Gear::FORWARD, 0, 0, 40);
-				control.addAction(Gear::FORWARD, -2000,30 , 240);
-				control.addAction(Gear::FORWARD, -2000,12 , 240);
-				control.addAction(Gear::FORWARD, 0, 0, 40);
+				control.addAction2(Gear::FORWARD, 0, 25, 200);
+				control.addAction(Gear::FORWARD, 0, 0, 220);
+				control.addAction(Gear::FORWARD, 0, 25, 100);
 				break;
 			case '2':
-				control.addAction2(Gear::FORWARD, 2000, 10, 100);
-				control.addAction(Gear::FORWARD, 0, 0, 1);
+				control.addAction2(Gear::FORWARD, -2000, 25, 600);
+				control.addAction(Gear::FORWARD, 0, 25, 100);
 				break;
 			case 'f':
 				std::cout << "1:state 2:pidprint ";
@@ -163,11 +201,20 @@ int cmdHandler()
 					break;
 				}
 				break;
-				
+
 			default:
 				break;
 		}
 	}
 
+	return 0;
+}
+
+int lidarHandler()
+{
+	while(1) {
+		std::cout << "sdfds " << std::endl;
+		//l.run();
+	}
 	return 0;
 }

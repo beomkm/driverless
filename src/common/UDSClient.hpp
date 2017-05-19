@@ -19,4 +19,5 @@ public:
 	int start();
 	int close();
 	float recvFloat();
+	int sendInt(int v);
 };

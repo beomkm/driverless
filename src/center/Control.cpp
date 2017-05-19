@@ -122,10 +122,9 @@ int Control::sendCommand()
 		setGear(action.gear);
 		setSteer(action.steer);
 		setSpeed(action.speed);
-		action.dist -= getSpeed();
-		actionQueue.front().dist = action.dist;
-		if(action.dist <= 0)
+		if(getEncoder() >= action.dist) {
 			actionQueue.pop();
+		}
 	}
 
 	sArr[11] += 1;
@@ -134,7 +133,7 @@ int Control::sendCommand()
 
 int Control::addAction(Gear gear, int steer, int speed, int time)
 {
-	Action action = {gear, steer, speed, 0};
+	Action action = {gear, steer, speed, -99999999};
 	for(int i=0; i<time; i++)
 		actionQueue.push(action);
 	return 0;
@@ -142,7 +141,7 @@ int Control::addAction(Gear gear, int steer, int speed, int time)
 
 int Control::addAction2(Gear gear, int steer, int speed, int dist)
 {
-	Action action = {gear, steer, speed, dist};
+	Action action = {gear, steer, speed, getEncoder()+dist};
 	actionQueue.push(action);
 	return 0;
 }

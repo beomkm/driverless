@@ -10,7 +10,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-#include "LMS1xx.h"
+#include "LMS1xx.hpp"
 
 
 // defines
@@ -23,7 +23,7 @@
 #define LIDAR_RESOLUTION    		5000
 #define LIDAR_FREQUENCY     		5000
 #define OBJECTRECOGMAXVAL		10
-#define OBJECTRECOGVAL			3
+#define OBJECTRECOGVAL			1
 
 #define USEAREA01			90
 #define USEAREA02			450
@@ -66,12 +66,14 @@ private:
   int       	_status;
   int		_critical;
 
+
   void setUpScanCfg();
 
 
 public:
   LidarManager();
   int  _mode;
+  int       _gap;
   // set up Link Lidar Deivce
   void setUpLidar();
   void run();

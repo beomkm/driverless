@@ -49,3 +49,10 @@ float UDSClient::recvFloat()
     read(cSock, &buf, sizeof(float));
     return buf;
 }
+
+int UDSClient::sendInt(int v)
+{
+	int buf = v;
+	write(cSock, &buf, sizeof(int));
+	return 0;
+}

@@ -21,4 +21,5 @@ public:
 	int start();
 	int close();
 	int sendFloat(float data);
+	int recvInt();
 };
